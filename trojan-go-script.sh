@@ -137,5 +137,7 @@ case $1 in
         firewall-cmd --add-service=http
         certbot renew
         firewall-cmd --reload
+        ;;
     *)
         echo 错误选项，只有安装(install)与证书续期(renew)选项
+esac
