@@ -59,8 +59,7 @@ function install(){
     wget ${download_url}
     unzip -o trojan-go-linux-amd64.zip -d ./trojan-go
     echo 拷贝trojan-go到bin
-    cd trojan-go
-    \cp trojan-go /usr/bin/
+    \cp ./trojan-go/trojan-go /usr/bin/
     if [ ! -d "/etc/trojan-go/" ];then
         echo 创建trojan-go配置文件
         mkdir /etc/trojan-go/
@@ -121,6 +120,9 @@ EOF
     [Install]
     WantedBy=multi-user.target
 EOF
+    echo 配置续期证书定时任务每天执行certbot renew
+    \cp ./trojan-go-script.sh /opt/
+    echo "0 2 * * * /opt/trojan-go-script.sh renew" > /var/spool/cron/root
     
     echo 开启trojan-go防火墙端口
     firewall-cmd --permanent --add-port=${port}/tcp
