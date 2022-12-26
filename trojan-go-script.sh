@@ -71,7 +71,7 @@ function install(){
 
     echo 创建server.json文件
     read -p "请输入端口号,密码,websocket路径: " port password path
-    cat > /etc/trojan-go/server.json <<EOF
+    cat > /etc/trojan-go/server.json <<-EOF
     {
         "run_type": "server",
         "local_addr": "0.0.0.0",
@@ -97,11 +97,12 @@ function install(){
         }
     }
     EOF
+    
     if [ ! -f /etc/systemd/system/trojan-go.service ];then
         sudo rm -f /etc/systemd/system/trojan-go.service
     fi
     echo 创建trojan-go服务
-    cat > /etc/systemd/system/trojan-go.service <<EOF
+    cat > /etc/systemd/system/trojan-go.service <<-EOF
     [Unit]
     Description=Trojan-Go - An unidentifiable mechanism that helps you bypass GFW
     Documentation=https://p4gefau1t.github.io/trojan-go/
@@ -120,6 +121,7 @@ function install(){
     [Install]
     WantedBy=multi-user.target
     EOF
+    
     echo 开启trojan-go防火墙端口
     firewall-cmd --permanent --add-port=${port}/tcp
     firewall-cmd --reload
