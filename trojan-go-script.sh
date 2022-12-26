@@ -96,7 +96,7 @@ function install(){
             "password": "${password}"
         }
     }
-    EOF
+EOF
     
     if [ ! -f /etc/systemd/system/trojan-go.service ];then
         sudo rm -f /etc/systemd/system/trojan-go.service
@@ -120,7 +120,7 @@ function install(){
 
     [Install]
     WantedBy=multi-user.target
-    EOF
+EOF
     
     echo 开启trojan-go防火墙端口
     firewall-cmd --permanent --add-port=${port}/tcp
