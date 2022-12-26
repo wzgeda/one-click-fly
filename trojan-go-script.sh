@@ -148,5 +148,5 @@ case $1 in
         renew
         ;;
     *)
-        echo 错误选项，只有安装(install)与证书续期(renew)选项
+        echo '错误选项，只有安装(install)与证书续期(renew)选项'
 esac
