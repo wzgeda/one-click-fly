@@ -15,7 +15,7 @@ read -p "请输入想要认证的域名: " sni
 echo 为认证修改nginx.conf配置
 sed -i "s/server_name.*_;/server_name\t${sni};/" /etc/nginx/nginx.conf
 echo 重启nginx服务
-systemctl start nginx
+systemctl restart nginx
 echo 删除默认html网页新建一个index.html
 rm -rf /usr/share/nginx/html/*
 echo "not" > /usr/share/nginx/html/index.html
@@ -28,8 +28,8 @@ ca=/etc/letsencrypt/live/${sni}/fullchain.pem
 key=/etc/letsencrypt/live/${sni}/privkey.pem
 echo 恢复因为认证被修改的nginx.conf
 \cp /etc/nginx/nginx.conf.bak /etc/nginx/nginx.conf
-echo nginx只监听本地网络
-sed -e '/listen.*\[::\]:80.*/d' -e 's/listen.*80;/listen\t127.0.0.1:80;/' -i /etc/nginx/nginx.conf
+# echo nginx只监听本地网络
+# sed -e '/listen.*\[::\]:80.*/d' -e 's/listen.*80;/listen\t127.0.0.1:80;/' -i /etc/nginx/nginx.conf
 echo 重启nginx服务
 systemctl restart nginx
 echo 切换至工作目录
@@ -111,3 +111,4 @@ echo 启动trojan-go服务
 systemctl restart trojan-go
 echo 配置开机启动服务
 systemctl enable trojan-go
+systemctl status trojan-go
