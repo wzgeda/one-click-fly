@@ -70,7 +70,7 @@ function install(){
             "enabled": true,
             "path": "${path}",
             "host": "${sni}"
-        }
+        },
         "shadowsocks": {
             "enabled": true,
             "method": "${method}",
@@ -128,12 +128,12 @@ EOF
             "enabled": true,
             "path": "${path}",
             "host": "${sni}"
-        }
+        },
         "shadowsocks": {
             "enabled": true,
             "method": "${method}",
             "password": "${spassword}"
-        }
+        },
         "mux": {
             "enabled": true
         }
