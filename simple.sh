@@ -79,8 +79,8 @@ EOF
     WantedBy=multi-user.target
 EOF
     # 配置续期证书定时任务每天执行certbot renew
-    \cp ./trojan-go-script.sh /opt/
-    echo "0 2 * * * /opt/trojan-go-script.sh renew" > /var/spool/cron/root
+    \cp ./simple.sh /opt/
+    echo "0 2 * * * bash /opt/simple.sh renew" > /var/spool/cron/root
     
     # 开启trojan-go防火墙端口
     firewall-cmd --permanent --add-port=${port}/tcp
