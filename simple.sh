@@ -45,7 +45,7 @@ function install(){
         "run_type": "server",
         "local_addr": "0.0.0.0",
         "local_port": ${port},
-        "remote_addr": "127.0.0.1",
+        "remote_addr": "www.czce.com.cn",
         "remote_port": 80,
         "password": [
             "${password}"
