@@ -1,18 +1,18 @@
 #!/bin/bash
 function install(){
-    # 开启防火墙并创建开机启动服务
+    # start ufw
     ufw enable
     systemctl enable ufw
 
-    # 关闭22端口，关闭sshd服务
+    # close sshd
     ufw delete allow 22
     systemctl stop sshd
     systemctl disable sshd
 
-    # 更新
+    # update
     apt update
 
-    # 下载所需软件
+    # download requires
     apt install certbot nginx unzip -y
     base_url=https://github.com/p4gefau1t/trojan-go
     version=$(curl ${base_url} | grep 'style="max-width: none' | sed -r 's|.*>(v.*)<.*|\1|')
@@ -20,14 +20,14 @@ function install(){
     wget ${download_url} -O trojan-go-linux-amd64.zip
     unzip -o trojan-go-linux-amd64.zip -d ./trojan-go
     
-    # 配置nginx
+    # configure nginx
     systemctl enable nginx
     sed -e '/listen.*\[::\]:80/d' -re 's/80/81/' -i.bak /etc/nginx/sites-available/default
     rm -rf /var/www/html/*
     echo "not" > /var/www/html/index.html
     systemctl restart nginx
 
-    # 配置certbot获取证书
+    # configure certbot
     ufw allow 80/tcp
     read -p "Please enter the domain name you want to authenticate: " sni
     certbot certonly --standalone -d ${sni}
@@ -35,7 +35,7 @@ function install(){
     key=/etc/letsencrypt/live/${sni}/privkey.pem
     ufw delete allow 80/tcp
     
-    # 配置trojan-go
+    # configure trojan-go
     systemctl stop trojna-go
     \cp ./trojan-go/trojan-go /usr/bin/
     if [ ! -d "/etc/trojan-go/" ];then
@@ -50,7 +50,7 @@ function install(){
         method=aes-128-gcm
     fi
     echo -e "port: ${port}\ntpssword: ${tpassword}\npath: ${path}\nmethod: ${method}\nspassword: ${spassword}"
-    # 生成trojan-go服务端配置
+    # generate server config
     cat > /etc/trojan-go/server.json <<-EOF
     {
         "run_type": "server",
@@ -79,7 +79,7 @@ function install(){
     }
 EOF
     
-    # 创建trojan-go服务
+    # create trojan-go service
     cat > /etc/systemd/system/trojan-go.service <<-EOF
     [Unit]
     Description=Trojan-Go - An unidentifiable mechanism that helps you bypass GFW
@@ -103,13 +103,13 @@ EOF
     
 
     
-    # 开启trojan-go防火墙端口
+    # enable trojan-go port
     ufw allow ${port}/tcp
-    # 启动trojan-go服务
+    # enable trojan-go serive
     systemctl restart trojan-go
-    # 配置开机启动服务
+    # configure Boot
     systemctl enable trojan-go
-    # 生成客户端配置文件
+    # generate client config
     cat > client.json <<-EOF
     {
         "run_type": "client",
@@ -138,18 +138,18 @@ EOF
         }
     }
 EOF
-    # 显示当前状态
+    # display status
     systemctl status trojan-go
 }
-    # 配置续期证书定时任务每天执行certbot renew
-    \cp ./trojan-go-ws-ss.sh /opt/
-    echo "0 2 * * * bash /opt/trojan-go-ws-ss.sh renew" > /var/spool/cron/root
+    # configure scheduled tasks (certbot)
+    \cp ./debian.sh /opt/
+    echo "0 2 * * * bash /opt/debian.sh renew" > /var/spool/cron/root
     
 function renew(){
-    echo 临时开启http端口
-    firewall-cmd --add-service=http
+    echo temporary opening port
+    ufw allow 80/tcp
     certbot renew
-    firewall-cmd --reload
+    ufw delete allow 80/tcp
 }
 case $1 in
     install)
