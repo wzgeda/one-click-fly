@@ -30,7 +30,7 @@ function main {
     read -p "请输入websocket路径(例如:/ray,请自定义不要使用/ray): " path
 
     # config xray
-	systemctl stop xray
+    systemctl stop xray
     \cp ./xray/xray /usr/bin/
     if [ ! -d "/etc/xray/" ];then
         mkdir /etc/xray/
@@ -75,7 +75,7 @@ Description=Xray Service
 Documentation=https://github.com/xtls
 After=network.target nss-lookup.target
 [Service]
-User=root
+User=nobody
 ExecStart=/usr/bin/xray run -config /etc/xray/config.json
 Restart=on-failure
 RestartPreventExitStatus=23
