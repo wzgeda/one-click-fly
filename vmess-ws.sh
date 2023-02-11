@@ -154,13 +154,13 @@ EOF
     echo "not" > /usr/share/nginx/html/index.html
     systemctl enable nginx
     systemctl restart nginx
-	echo "ssl端口: ${ssl_port}"
-	echo "域名: ${sni}"
-	echo "证书: ${ca}"
-	echo "证书key: ${key}"
-	echo "websocket目录: ${path}"
-	echo "vmess id: ${id}"
-	# cron
-	echo "0 2 * * * certbot renew" > /var/spool/cron/root
+    echo "ssl端口: ${ssl_port}"
+    echo "域名: ${sni}"
+    echo "证书: ${ca}"
+    echo "证书key: ${key}"
+    echo "websocket目录: ${path}"
+    echo "vmess id: ${id}"
+    # cron
+    echo "0 2 * * * certbot renew" > /var/spool/cron/root
 }
 main
