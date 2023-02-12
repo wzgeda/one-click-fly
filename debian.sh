@@ -1,14 +1,5 @@
 #!/bin/bash
 function install(){
-    # start ufw
-    ufw enable
-    systemctl enable ufw
-
-    # close sshd
-    ufw delete allow 22
-    systemctl stop sshd
-    systemctl disable sshd
-
     # update
     apt update
 
@@ -28,12 +19,10 @@ function install(){
     systemctl restart nginx
 
     # configure certbot
-    ufw allow 80/tcp
     read -p "Please enter the domain name you want to authenticate: " sni
     certbot certonly --standalone -d ${sni}
     ca=/etc/letsencrypt/live/${sni}/fullchain.pem
     key=/etc/letsencrypt/live/${sni}/privkey.pem
-    ufw delete allow 80/tcp
     
     # configure trojan-go
     systemctl stop trojna-go
@@ -101,14 +90,10 @@ EOF
 EOF
     systemctl daemon-reload
     
-
-    
-    # enable trojan-go port
-    ufw allow ${port}/tcp
     # enable trojan-go serive
     systemctl restart trojan-go
-    # configure Boot
     systemctl enable trojan-go
+    
     # generate client config
     cat > client.json <<-EOF
     {
@@ -140,24 +125,8 @@ EOF
 EOF
     # display status
     systemctl status trojan-go
-}
-    # configure scheduled tasks (certbot)
-    \cp ./debian.sh /opt/
-    echo "0 2 * * * bash /opt/debian.sh renew" > /var/spool/cron/root
     
-function renew(){
-    echo temporary opening port
-    ufw allow 80/tcp
-    certbot renew
-    ufw delete allow 80/tcp
+    # configure scheduled tasks (certbot)
+    echo "0 2 * * * certbot renew" > /var/spool/cron/root
 }
-case $1 in
-    install)
-        install
-        ;;
-    renew)
-        renew
-        ;;
-    *)
-        echo 'error，only install and renew options'
-esac
+install
