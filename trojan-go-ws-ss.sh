@@ -135,24 +135,8 @@ EOF
 EOF
     # 显示当前状态
     systemctl status trojan-go
-}
-    # 配置续期证书定时任务每天执行certbot renew
-    \cp ./trojan-go-ws-ss.sh /opt/
-    echo "0 2 * * * bash /opt/trojan-go-ws-ss.sh renew" > /var/spool/cron/root
     
-function renew(){
-    echo 临时开启http端口
-    firewall-cmd --add-service=http
-    certbot renew
-    firewall-cmd --reload
+    # 配置续期证书定时任务每天执行certbot renew
+    echo "0 2 * * * certbot renew" > /var/spool/cron/root
 }
-case $1 in
-    install)
-        install
-        ;;
-    renew)
-        renew
-        ;;
-    *)
-        echo '错误选项，只有安装(install)与证书续期(renew)选项'
-esac
+install
