@@ -1,5 +1,8 @@
 #!/bin/bash
 function install(){
+    # disable ufw
+    ufw disable
+    
     # update
     apt update
 
