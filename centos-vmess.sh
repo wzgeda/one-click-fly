@@ -22,10 +22,6 @@ function main {
     if [ -z ${ssl_port} ];then
         ssl_port=443
     fi
-    read -p "请输入vmess端口(默认:10000): " vmess_port
-    if [ -z ${vmess_port} ];then
-        vmess_port=10000
-    fi
     read -p "请输入vmess密码(id): " id
     read -p "请输入websocket路径(例如:/ray,请自定义不要使用/ray): " path
 
@@ -41,8 +37,8 @@ function main {
 {
   "inbounds": [
     {
-      "port": ${vmess_port},
-      "listen":"127.0.0.1",
+      "port": ${ssl_port},
+      "listen":"0.0.0.0",
       "protocol": "vmess",
       "settings": {
         "clients": [
@@ -50,20 +46,33 @@ function main {
             "id": "${id}",
             "alterId": 0
           }
+        ],
+        "fallbacks": [
+            {
+                "dest": 81
+            }
         ]
       },
       "streamSettings": {
         "network": "ws",
+        "security": "tls",
+        "tlsSettings": {
+            "certificates": [
+                {
+                    "certificateFile": "${ca}",
+                    "keyFile": "${key}"
+                }
+            ]
+        },
         "wsSettings": {
-        "path": "${path}"
+            "path": "${path}"
         }
       }
     }
   ],
   "outbounds": [
     {
-      "protocol": "freedom",
-      "settings": {}
+      "protocol": "freedom"
     }
   ]
 }
@@ -75,7 +84,7 @@ Description=Xray Service
 Documentation=https://github.com/xtls
 After=network.target nss-lookup.target
 [Service]
-User=nobody
+User=root
 ExecStart=/usr/bin/xray run -config /etc/xray/config.json
 Restart=on-failure
 RestartPreventExitStatus=23
@@ -113,30 +122,19 @@ http {
     default_type        application/octet-stream;
     include /etc/nginx/conf.d/*.conf;
     server {
-        listen ${ssl_port} ssl;
-        listen [::]:${ssl_port} ssl;
-      
-        ssl_certificate       ${ca};
-        ssl_certificate_key   ${key};
-        ssl_session_timeout 1d;
-        ssl_session_cache shared:MozSSL:10m;
-        ssl_session_tickets off;
-        ssl_protocols         TLSv1.2 TLSv1.3;
-        ssl_ciphers           ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384;
-        ssl_prefer_server_ciphers off;
-        server_name           ${sni};
-        location ${path} {
-            if (\$http_upgrade != "websocket") {
-                return 404;
-            }
-            proxy_redirect off;
-            proxy_pass http://127.0.0.1:${vmess_port};
-            proxy_http_version 1.1;
-            proxy_set_header Upgrade \$http_upgrade;
-            proxy_set_header Connection "upgrade";
-            proxy_set_header Host \$host;
-            proxy_set_header X-Real-IP \$remote_addr;
-            proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        listen       81;
+        server_name  127.0.0.1;
+        root         /usr/share/nginx/html;
+
+        # Load configuration files for the default server block.
+        include /etc/nginx/default.d/*.conf;
+
+        error_page 404 /404.html;
+        location = /404.html {
+        }
+
+        error_page 500 502 503 504 /50x.html;
+        location = /50x.html {
         }
     }
 }
