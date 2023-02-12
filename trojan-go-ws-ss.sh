@@ -3,12 +3,6 @@ function install(){
     # 开启防火墙并创建开机启动服务
     systemctl enable --now firewalld
 
-    # 关闭22端口，关闭sshd服务
-    firewall-cmd --permanent --remove-service=ssh
-    firewall-cmd --reload
-    systemctl stop sshd
-    systemctl disable sshd
-
     # 重建软件仓库缓存索引
     yum makecache
 
