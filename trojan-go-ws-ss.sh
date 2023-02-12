@@ -1,8 +1,11 @@
 #!/bin/bash
 function install(){
-    # 开启防火墙并创建开机启动服务
+    # 开启防火墙并创建开机启动服务并开启http,https服务
     systemctl enable --now firewalld
-
+    firewall-cmd --add-service=http --permanent
+    firewall-cmd --add-service=https --permanent
+    firewall-cmd --reload
+    
     # 重建软件仓库缓存索引
     yum makecache
 
@@ -22,12 +25,11 @@ function install(){
     systemctl restart nginx
 
     # 配置certbot获取证书
-    firewall-cmd --add-service=http
     read -p "Please enter the domain name you want to authenticate: " sni
     certbot certonly --standalone -d ${sni}
     ca=/etc/letsencrypt/live/${sni}/fullchain.pem
     key=/etc/letsencrypt/live/${sni}/privkey.pem
-    firewall-cmd --reload
+    
     
     # 配置trojan-go
     systemctl stop trojna-go
