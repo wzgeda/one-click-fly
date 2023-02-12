@@ -1,9 +1,9 @@
 #!/bin/bash
 function install(){
-    # 开启防火墙并创建开机启动服务并开启http,https服务
+    # 开启防火墙并创建开机启动服务
     systemctl enable --now firewalld
+    # 开启http服务,为获取证书使用
     firewall-cmd --add-service=http --permanent
-    firewall-cmd --add-service=https --permanent
     firewall-cmd --reload
     
     # 重建软件仓库缓存索引
