@@ -1,5 +1,5 @@
 #!/bin/bash
-function main(){    
+function main {    
     # update
     apt update
 
