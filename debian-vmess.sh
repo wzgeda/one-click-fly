@@ -19,17 +19,17 @@ function main(){
     systemctl restart nginx
 
     # get certificate
-    read -p "请输入要获取证书的域名: " sni
+    read -p "sni " sni
     certbot certonly --standalone -d ${sni}
     ca=/etc/letsencrypt/live/${sni}/fullchain.pem
     key=/etc/letsencrypt/live/${sni}/privkey.pem
 
-    read -p "请输入ssl端口(默认:443): " ssl_port
+    read -p "ssl port: " ssl_port
     if [ -z ${ssl_port} ];then
         ssl_port=443
     fi
-    read -p "请输入vmess密码(id): " id
-    read -p "请输入websocket路径(例如:/ray,请自定义不要使用/ray): " path
+    read -p "vmess id: " id
+    read -p "websocket path(demo:/ray): " path
     
     # config xray
     systemctl stop xray
@@ -103,11 +103,11 @@ EOF
     systemctl restart xray
     
     # print config
-    echo "ssl端口: ${ssl_port}"
-    echo "域名: ${sni}"
-    echo "证书: ${ca}"
-    echo "证书key: ${key}"
-    echo "websocket目录: ${path}"
+    echo "ssl port: ${ssl_port}"
+    echo "sni: ${sni}"
+    echo "ca: ${ca}"
+    echo "key: ${key}"
+    echo "websocket path: ${path}"
     echo "vmess id: ${id}"
     
     # cron
