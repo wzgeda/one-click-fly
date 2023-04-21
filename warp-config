@@ -1,0 +1,23 @@
+1.install the repository's GPG key
+curl https://pkg.cloudflareclient.com/pubkey.gpg | sudo gpg --yes --dearmor --output /usr/share/keyrings/cloudflare-warp-archive-keyring.gpg
+
+2.add the repository to your machine's apt sources
+echo "deb [arch=amd64 signed-by=/usr/share/keyrings/cloudflare-warp-archive-keyring.gpg] https://pkg.cloudflareclient.com/ $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/cloudflare-client.list
+
+3.update the APT cache
+apt update
+
+4.install warp
+apt install cloudflare-warp
+
+5.register warp
+warp-cli register
+
+6.set mode proxy
+warp-cli set-mode proxy
+
+7.connect warp
+warp-cli connect
+
+8.test ip
+curl ifconfig.me --proxy socks5:/127.0.0.1:40000
