@@ -23,7 +23,10 @@ install() {
     certbot certonly --standalone -d ${sni}
     ca=/etc/letsencrypt/live/${sni}/fullchain.pem
     key=/etc/letsencrypt/live/${sni}/privkey.pem
-
+    
+    # add certbot daily enable
+    systemctl enable certbot.timer
+    
     read -p "vless id: " id
     
     # config xray
@@ -126,8 +129,5 @@ EOF
     echo "ca: ${ca}"
     echo "key: ${key}"
     echo "vless id: ${id}"
-    
-    # cron
-    echo "0 2 * * * certbot renew" > /var/spool/cron/root
 }
 install
