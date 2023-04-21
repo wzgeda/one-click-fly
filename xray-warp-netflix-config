@@ -1,0 +1,28 @@
+{
+    "routing": {
+    "domainStrategy": "IPIfNonMatch",
+    "rules": [
+        {
+            "type": "field",
+            "domain": [
+                "geosite:netflix"  #选择奈飞的域名
+            ],
+            "outboundTag": "netflix" # 出口选择奈飞标签
+        }
+    ]
+  },
+    "outbounds": [
+        {
+            "tag": "netflix",
+            "protocol": "socks",
+            "settings": {
+            "servers": [
+                {
+                    "address": "127.0.0.1",
+                    "port": 40000    # warp 默认端口
+                }
+              ]
+            }
+        }
+    ]
+}
