@@ -1,5 +1,5 @@
-#!/bin/bash
-function install(){
+#!/bin/sh
+install() {
     # disable ufw
     ufw disable
     
@@ -26,6 +26,7 @@ function install(){
     certbot certonly --standalone -d ${sni}
     ca=/etc/letsencrypt/live/${sni}/fullchain.pem
     key=/etc/letsencrypt/live/${sni}/privkey.pem
+    systemctl enable certbot.timer
     
     # configure trojan-go
     systemctl stop trojna-go
@@ -126,8 +127,5 @@ EOF
 EOF
     # display status
     systemctl status trojan-go
-    
-    # configure scheduled tasks (certbot)
-    echo "0 2 * * * certbot renew" > /var/spool/cron/root
 }
 install
