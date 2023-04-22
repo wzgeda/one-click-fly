@@ -34,15 +34,22 @@ install() {
     
     # config xray
     systemctl stop xray
-    \cp ./xray/xray /usr/bin/
-    if [ ! -d "/etc/xray/" ];then
-        mkdir /etc/xray/
-    fi
-	# xray configfile
-    cat > /etc/xray/config.json <<-EOF
+    cat > /root/xray/server.json <<-EOF
 {
     "log": {
         "loglevel": "warning"
+    },
+    "routing": {
+    "domainStrategy": "IPIfNonMatch",
+    "rules": [
+        {
+            "type": "field",
+            "domain": [
+                "geosite:openai"
+            ],
+            "outboundTag": "openai"
+        }
+      ]
     },
     "inbounds": [
         {
@@ -95,6 +102,18 @@ install() {
         {
             "protocol": "blackhole",
             "tag": "block"
+        },
+	{
+            "tag": "netflix",
+            "protocol": "socks",
+            "settings": {
+            "servers": [
+                {
+                    "address": "127.0.0.1",
+                    "port": 40000
+                }
+              ]
+            }
         }
     ],
     "policy": {
@@ -115,7 +134,7 @@ Documentation=https://github.com/xtls
 After=network.target nss-lookup.target
 [Service]
 User=root
-ExecStart=/usr/bin/xray run -config /etc/xray/config.json
+ExecStart=/root/xray/xray run -config /root/xray/server.json
 Restart=on-failure
 RestartPreventExitStatus=23
 LimitNPROC=10000
